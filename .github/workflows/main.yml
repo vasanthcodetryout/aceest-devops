@@ -1,0 +1,98 @@
+# .github/workflows/main.yml — ACEest CI/CD Pipeline
+# =============================================================================
+# This file defines the automated pipeline that runs on GitHub's servers
+# every time you push code or open a pull request.
+#
+# STAGES:
+#   1. Lint      — checks code style with flake8
+#   2. Test      — runs pytest to validate all routes
+#   3. Docker    — builds the Docker image to confirm it compiles
+#   4. DockerTest — runs pytest INSIDE the container (proves it works end-to-end)
+# =============================================================================
+
+name: ACEest CI/CD Pipeline
+
+# ── TRIGGER ────────────────────────────────────────────────────────────────
+# Run this pipeline on every push OR pull_request to the main branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# ── JOBS ───────────────────────────────────────────────────────────────────
+jobs:
+
+  # ── JOB 1: BUILD, LINT & TEST ────────────────────────────────────────────
+  build-and-test:
+    name: Build, Lint & Test
+    runs-on: ubuntu-latest       # GitHub provides a free Ubuntu VM
+
+    steps:
+
+      # Step 1: Download your repo code onto the GitHub runner VM
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python 3.11 on the runner VM
+      - name: Set Up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Step 3: Install project dependencies from requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: LINT — check for syntax errors and style issues
+      # flake8 will FAIL the pipeline if there are errors (exit code != 0)
+      # --max-line-length=100  allows slightly longer lines
+      # --ignore=E501          ignores line-too-long in the main check
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          echo "--- Checking for syntax errors (critical) ---"
+          flake8 app.py --count --select=E9,F63,F7,F82 --show-source --statistics
+          echo "--- Style check (warnings only) ---"
+          flake8 app.py --count --max-line-length=100 --statistics
+
+      # Step 5: TEST — run all pytest cases, print verbose output
+      - name: Run Pytest Suite
+        run: |
+          pytest tests/ -v --tb=short
+
+  # ── JOB 2: DOCKER BUILD & TEST ───────────────────────────────────────────
+  docker:
+    name: Docker Build & Container Test
+    runs-on: ubuntu-latest
+    needs: build-and-test        # Only runs if Job 1 passes
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Build the Docker image using our Dockerfile
+      # -t tags it with a name so we can reference it in the next step
+      - name: Build Docker Image
+        run: |
+          docker build -t aceest-fitness:latest .
+          echo "Docker image built successfully"
+
+      # Run the tests INSIDE the container to prove the containerized app works
+      # --rm removes the container after it exits (cleanup)
+      # We override the CMD (python app.py) with pytest
+      - name: Run Tests Inside Docker Container
+        run: |
+          docker run --rm aceest-fitness:latest pytest tests/ -v --tb=short
+
+      # Verify the app actually starts and the health endpoint responds
+      - name: Smoke Test — Verify App Starts
+        run: |
+          docker run -d -p 5000:5000 --name aceest-smoke aceest-fitness:latest
+          sleep 3
+          curl -f http://localhost:5000/ || (docker logs aceest-smoke && exit 1)
+          docker stop aceest-smoke
+          echo "Smoke test passed — app is reachable on port 5000"
