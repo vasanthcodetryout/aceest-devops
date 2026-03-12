@@ -1,0 +1,6 @@
+# requirements.txt — ACEest Fitness & Gym
+# Pin exact versions for reproducibility (critical in CI/CD pipelines)
+
+flask==3.0.3
+pytest==8.2.2
+pytest-flask==1.3.0
