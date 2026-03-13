@@ -79,11 +79,11 @@ class TestPrograms:
 class TestProgramDetail:
 
     def test_valid_fat_loss_program(self, client):
-        response = client.get("/program/Fat Loss")
+        response = client.get("/program/Fat Loss (FL)")
         assert response.status_code == 200
 
     def test_valid_muscle_gain_program(self, client):
-        response = client.get("/program/Muscle Gain")
+        response = client.get("/program/Muscle Gain (MG)")
         assert response.status_code == 200
 
     def test_valid_beginner_program(self, client):
