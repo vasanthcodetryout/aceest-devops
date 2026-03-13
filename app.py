@@ -197,13 +197,14 @@ def calculate_calories():
 
     Example: GET /calories?weight=80&program=Fat Loss (FL)
     """
-    weight  = request.args.get("weight",  type=float)
+    weight = request.args.get("weight",  type=float)
     program = request.args.get("program", type=str)
 
     if weight is None or weight <= 0:
         return jsonify({"error": "Valid weight (kg) is required"}), 400
     if not program or program not in PROGRAMS:
-        return jsonify({"error": f"Valid program is required. Options: {list(PROGRAMS.keys())}"}), 400
+        options = list(PROGRAMS.keys())
+        return jsonify({"error": f"Valid program is required. Options: {options}"}), 400
 
     calories = int(weight * PROGRAMS[program]["calorie_factor"])
 
