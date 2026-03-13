@@ -1,7 +1,7 @@
 # ACEest Fitness & Gym — DevOps CI/CD Pipeline
 
-> **Course:** Introduction to DevOps (CSIZG514/SEZG514/SEUSZG514) — S2-25  
-> **Assignment:** 1 — Automated CI/CD Pipeline Implementation
+> **Course:** Introduction to DevOps
+> **Assignment:** Automated CI/CD Pipeline Implementation
 
 ---
 
