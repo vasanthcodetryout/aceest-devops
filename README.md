@@ -184,7 +184,7 @@ A **red X ❌** = something failed (click to see which step and why)
 ### Jenkins Job Configuration
 
 **Source Code Management:**
-- Repository URL: `https://github.com/YOUR_USERNAME/aceest-devops.git`
+- Repository URL: `https://github.com/vasanthcodetryout/aceest-devops`
 - Branch: `*/main`
 
 **Build Triggers:**
@@ -218,43 +218,4 @@ echo "=== BUILD COMPLETE ==="
 
 Both must pass before code is considered "production-ready."
 
----
 
-## Git Commit History
-
-This project follows **Conventional Commits** for readable history:
-
-```
-feat:  new feature
-fix:   bug fix
-build: Dockerfile / dependency changes  
-ci:    GitHub Actions / Jenkins changes
-test:  pytest additions
-docs:  README changes
-```
-
-Example commits in this project:
-```
-feat: add Flask REST API for ACEest fitness management
-test: add 30+ pytest cases covering all endpoints and edge cases
-build: add optimized slim Dockerfile with non-root user
-ci: add GitHub Actions pipeline with lint, test, and docker stages
-docs: add professional README with setup and CI/CD documentation
-```
-
----
-
-## Project Structure
-
-```
-aceest-devops/
-├── app.py                        ← Flask REST API (6 endpoints)
-├── requirements.txt              ← Pinned dependencies
-├── Dockerfile                    ← Optimized container config
-├── README.md                     ← This file
-├── .github/
-│   └── workflows/
-│       └── main.yml              ← GitHub Actions CI/CD pipeline
-└── tests/
-    └── test_app.py               ← 30+ Pytest test cases
-```
